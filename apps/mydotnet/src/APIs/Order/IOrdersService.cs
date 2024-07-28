@@ -39,4 +39,5 @@ public interface IOrdersService
     /// Get a customer record for Order
     /// </summary>
     public Task<Customer> GetCustomer(OrderWhereUniqueInput uniqueId);
+    public Task<string> OrderCustomTwo(string data);
 }

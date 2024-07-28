@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mydotnet.APIs;
-using Mydotnet.APIs.Common;
 using Mydotnet.APIs.Dtos;
 using Mydotnet.APIs.Errors;
 
@@ -31,25 +30,6 @@ public abstract class OrdersControllerBase : ControllerBase
     }
 
     /// <summary>
-    /// Delete one Order
-    /// </summary>
-    [HttpDelete("{Id}")]
-    [Authorize(Roles = "user")]
-    public async Task<ActionResult> DeleteOrder([FromRoute()] OrderWhereUniqueInput uniqueId)
-    {
-        try
-        {
-            await _service.DeleteOrder(uniqueId);
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
-
-        return NoContent();
-    }
-
-    /// <summary>
     /// Find many Orders
     /// </summary>
     [HttpGet()]
@@ -57,15 +37,6 @@ public abstract class OrdersControllerBase : ControllerBase
     public async Task<ActionResult<List<Order>>> Orders([FromQuery()] OrderFindManyArgs filter)
     {
         return Ok(await _service.Orders(filter));
-    }
-
-    /// <summary>
-    /// Meta data about Order records
-    /// </summary>
-    [HttpPost("meta")]
-    public async Task<ActionResult<MetadataDto>> OrdersMeta([FromQuery()] OrderFindManyArgs filter)
-    {
-        return Ok(await _service.OrdersMeta(filter));
     }
 
     /// <summary>
@@ -117,5 +88,12 @@ public abstract class OrdersControllerBase : ControllerBase
     {
         var customer = await _service.GetCustomer(uniqueId);
         return Ok(customer);
+    }
+
+    [HttpGet("{Id}/order-custom-two")]
+    [Authorize(Roles = "user")]
+    public async Task<string> OrderCustomTwo([FromBody()] string data)
+    {
+        return await _service.OrderCustomTwo(data);
     }
 }

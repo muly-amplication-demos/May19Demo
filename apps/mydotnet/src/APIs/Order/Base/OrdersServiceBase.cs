@@ -152,4 +152,9 @@ public abstract class OrdersServiceBase : IOrdersService
         }
         return order.Customer.ToDto();
     }
+
+    public async Task<string> OrderCustomTwo(string data)
+    {
+        throw new NotImplementedException();
+    }
 }
