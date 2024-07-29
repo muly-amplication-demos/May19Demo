@@ -29,7 +29,6 @@ public static class ProductsExtensions
             Sku = updateDto.Sku
         };
 
-        // map required fields
         if (updateDto.CreatedAt != null)
         {
             product.CreatedAt = updateDto.CreatedAt.Value;
