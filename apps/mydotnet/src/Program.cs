@@ -6,13 +6,13 @@ using Mydotnet.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-
-builder.Services.RegisterServices();
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddControllers();
+    builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+    
+    builder.Services.RegisterServices();
+        
+    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+    builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
   {
       options.UseOpenApiAuthentication();
@@ -36,38 +36,38 @@ builder.Services.AddCors(builder =>
 builder.Services.AddApiAuthentication();
 builder.Services.AddDbContext<MydotnetDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 var app = builder.Build();
-
-app.UseCors();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseStaticFiles();
-
-    app.UseSwaggerUI(options =>
+    
+    app.UseCors();
+    
+    if (app.Environment.IsDevelopment())
     {
-        options.InjectStylesheet("/swagger-ui/swagger.css");
-    });
+        app.UseSwagger();
+        app.UseStaticFiles();
+    
+        app.UseSwaggerUI(options =>
+        {
+            options.InjectStylesheet("/swagger-ui/swagger.css");
+        });
+    
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+        }
+    }
+    
+    app.UseHttpsRedirection();
+    
+    app.MapControllers();
+app.UseApiAuthentication();
+using (var scope = app.Services.CreateScope())
+  {
+      var services = scope.ServiceProvider;
+      await RolesManager.SyncRoles(services, app.Configuration);
+  }
 
     using (var scope = app.Services.CreateScope())
     {
         var services = scope.ServiceProvider;
+        await SeedDevelopmentData.SeedDevUser(services, app.Configuration);
     }
-}
-
-app.UseHttpsRedirection();
-
-app.MapControllers();
-app.UseApiAuthentication();
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    await RolesManager.SyncRoles(services, app.Configuration);
-}
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    await SeedDevelopmentData.SeedDevUser(services, app.Configuration);
-}
 app.Run();

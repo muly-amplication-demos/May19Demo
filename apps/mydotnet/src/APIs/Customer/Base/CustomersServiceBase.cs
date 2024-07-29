@@ -12,68 +12,60 @@ namespace Mydotnet.APIs;
 public abstract class CustomersServiceBase : ICustomersService
 {
     protected readonly MydotnetDbContext _context;
-    public CustomersServiceBase(MydotnetDbContext context)
-    {
-        _context = context;
-    }
+    public CustomersServiceBase (MydotnetDbContext context) {
+        _context = context;}
 
     /// <summary>
     /// Create one Customer
     /// </summary>
-    public async Task<Customer> CreateCustomer(CustomerCreateInput createDto)
-    {
+    public async Task<Customer> CreateCustomer(CustomerCreateInput createDto) {
         var customer = new CustomerDbModel
-        {
-            CreatedAt = createDto.CreatedAt,
-            LastName = createDto.LastName,
-            Name = createDto.Name,
-            UpdatedAt = createDto.UpdatedAt
-        };
-
-        if (createDto.Id != null)
-        {
+                  {
+              CreatedAt = createDto.CreatedAt,
+LastName = createDto.LastName,
+Name = createDto.Name,
+UpdatedAt = createDto.UpdatedAt    
+          };
+    
+          if (createDto.Id != null){
             customer.Id = createDto.Id;
-        }
-        if (createDto.Orders != null)
-        {
-            customer.Orders = await _context
-                .Orders.Where(order => createDto.Orders.Select(t => t.Id).Contains(order.Id))
-                .ToListAsync();
-        }
+          }
+          if (createDto.Orders != null)
+            {
+                customer.Orders = await _context
+                    .Orders.Where(order => createDto.Orders.Select(t => t.Id).Contains(order.Id))
+                    .ToListAsync();
+            }
 
-        _context.Customers.Add(customer);
-        await _context.SaveChangesAsync();
-
-        var result = await _context.FindAsync<CustomerDbModel>(customer.Id);
-
-        if (result == null)
-        {
-            throw new NotFoundException();
-        }
-
-        return result.ToDto();
-    }
+            _context.Customers.Add(customer);
+            await _context.SaveChangesAsync();
+    
+            var result = await _context.FindAsync<CustomerDbModel>(customer.Id);
+    
+            if (result == null)
+            {
+                throw new NotFoundException();
+            }
+    
+            return result.ToDto();}
 
     /// <summary>
     /// Delete one Customer
     /// </summary>
-    public async Task DeleteCustomer(CustomerWhereUniqueInput uniqueId)
-    {
+    public async Task DeleteCustomer(CustomerWhereUniqueInput uniqueId) {
         var customer = await _context.Customers.FindAsync(uniqueId.Id);
-        if (customer == null)
-        {
-            throw new NotFoundException();
-        }
-
-        _context.Customers.Remove(customer);
-        await _context.SaveChangesAsync();
-    }
+              if (customer == null)
+      {
+          throw new NotFoundException();
+      }
+  
+      _context.Customers.Remove(customer);
+      await _context.SaveChangesAsync();}
 
     /// <summary>
     /// Find many Customers
     /// </summary>
-    public async Task<List<Customer>> Customers(CustomerFindManyArgs findManyArgs)
-    {
+    public async Task<List<Customer>> Customers(CustomerFindManyArgs findManyArgs) {
         var customers = await _context
             .Customers
     .Include(x => x.Orders)
@@ -82,133 +74,120 @@ public abstract class CustomersServiceBase : ICustomersService
     .ApplyTake(findManyArgs.Take)
     .ApplyOrderBy(findManyArgs.SortBy)
     .ToListAsync();
-        return customers.ConvertAll(customer => customer.ToDto());
-    }
+    return customers.ConvertAll(customer => customer.ToDto());}
 
     /// <summary>
     /// Meta data about Customer records
     /// </summary>
-    public async Task<MetadataDto> CustomersMeta(CustomerFindManyArgs findManyArgs)
-    {
+    public async Task<MetadataDto> CustomersMeta(CustomerFindManyArgs findManyArgs) {
+        
+                var count = await _context
+            .Customers
+            .ApplyWhere(findManyArgs.Where)
+            .CountAsync();
 
-        var count = await _context
-    .Customers
-    .ApplyWhere(findManyArgs.Where)
-    .CountAsync();
-
-        return new MetadataDto { Count = count };
-    }
+        return new MetadataDto { Count = count };}
 
     /// <summary>
     /// Get one Customer
     /// </summary>
-    public async Task<Customer> Customer(CustomerWhereUniqueInput uniqueId)
-    {
+    public async Task<Customer> Customer(CustomerWhereUniqueInput uniqueId) {
         var customers = await this.Customers(
                 new CustomerFindManyArgs { Where = new CustomerWhereInput { Id = uniqueId.Id } }
     );
-        var customer = customers.FirstOrDefault();
-        if (customer == null)
-        {
-            throw new NotFoundException();
-        }
-
-        return customer;
+    var customer = customers.FirstOrDefault();
+    if (customer == null)
+    {
+        throw new NotFoundException();
     }
+    
+    return customer;}
 
     /// <summary>
     /// Update one Customer
     /// </summary>
-    public async Task UpdateCustomer(CustomerWhereUniqueInput uniqueId, CustomerUpdateInput updateDto)
-    {
+    public async Task UpdateCustomer(CustomerWhereUniqueInput uniqueId, CustomerUpdateInput updateDto) {
         var customer = updateDto.ToModel(uniqueId);
-
-        if (updateDto.Orders != null)
+        
+    if (updateDto.Orders != null)
         {
             customer.Orders = await _context
                 .Orders.Where(order => updateDto.Orders.Select(t => t).Contains(order.Id))
                 .ToListAsync();
         }
-
-        _context.Entry(customer).State = EntityState.Modified;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!_context.Customers.Any(e => e.Id == customer.Id))
-            {
-                throw new NotFoundException();
-            }
-            else
-            {
-                throw;
-            }
-        }
+  
+    _context.Entry(customer).State = EntityState.Modified;
+  
+    try
+    {
+        await _context.SaveChangesAsync();
     }
+    catch (DbUpdateConcurrencyException)
+    {
+        if (! _context.Customers.Any(e => e.Id == customer.Id))
+        {
+            throw new NotFoundException();
+        }
+        else
+        {
+            throw;
+        }
+    }}
 
     /// <summary>
     /// Connect multiple Orders records to Customer
     /// </summary>
-    public async Task ConnectOrders(CustomerWhereUniqueInput uniqueId, OrderWhereUniqueInput[] ordersId)
-    {
+    public async Task ConnectOrders(CustomerWhereUniqueInput uniqueId, OrderWhereUniqueInput[] ordersId) {
         var customer = await _context
             .Customers.Include(x => x.Orders)
     .FirstOrDefaultAsync(x => x.Id == uniqueId.Id);
-        if (customer == null)
-        {
-            throw new NotFoundException();
-        }
+  if (customer == null)
+  {
+    throw new NotFoundException();
+  }
 
-        var orders = await _context
-          .Orders.Where(t => ordersId.Select(x => x.Id).Contains(t.Id))
-          .ToListAsync();
-        if (orders.Count == 0)
-        {
-            throw new NotFoundException();
-        }
+  var orders = await _context
+    .Orders.Where(t => ordersId.Select(x => x.Id).Contains(t.Id))
+    .ToListAsync();
+  if (orders.Count == 0)
+  {
+    throw new NotFoundException();
+  }
 
-        var ordersToConnect = orders.Except(customer.Orders);
+  var ordersToConnect = orders.Except(customer.Orders);
 
-        foreach (var order in ordersToConnect)
-        {
-            customer.Orders.Add(order);
-        }
+  foreach (var order in ordersToConnect){
+    customer.Orders.Add(order);
+  }
 
-        await _context.SaveChangesAsync();
-    }
+  await _context.SaveChangesAsync();}
 
     /// <summary>
     /// Disconnect multiple Orders records from Customer
     /// </summary>
-    public async Task DisconnectOrders(CustomerWhereUniqueInput uniqueId, OrderWhereUniqueInput[] ordersId)
-    {
+    public async Task DisconnectOrders(CustomerWhereUniqueInput uniqueId, OrderWhereUniqueInput[] ordersId) {
         var customer = await _context
                               .Customers.Include(x => x.Orders)
                       .FirstOrDefaultAsync(x => x.Id == uniqueId.Id);
-        if (customer == null)
-        {
-            throw new NotFoundException();
-        }
-
-        var orders = await _context
-          .Orders.Where(t => ordersId.Select(x => x.Id).Contains(t.Id))
-          .ToListAsync();
-
-        foreach (var order in orders)
-        {
-            customer.Orders?.Remove(order);
-        }
-        await _context.SaveChangesAsync();
+    if (customer == null)
+    {
+      throw new NotFoundException();
     }
+
+    var orders = await _context
+      .Orders.Where(t => ordersId.Select(x => x.Id).Contains(t.Id))
+      .ToListAsync();
+
+    foreach (var order in orders)
+    {
+      customer.Orders?.Remove(order);
+    }
+    await _context.SaveChangesAsync();}
 
     /// <summary>
     /// Find multiple Orders records for Customer
     /// </summary>
-    public async Task<List<Order>> FindOrders(CustomerWhereUniqueInput uniqueId, OrderFindManyArgs customerFindManyArgs)
-    {
+    public async Task<List<Order>> FindOrders(CustomerWhereUniqueInput uniqueId, OrderFindManyArgs customerFindManyArgs) {
         var orders = await _context
             .Orders
     .Where(m => m.CustomerId == uniqueId.Id)
@@ -218,33 +197,30 @@ public abstract class CustomersServiceBase : ICustomersService
     .ApplyOrderBy(customerFindManyArgs.SortBy)
     .ToListAsync();
 
-        return orders.Select(x => x.ToDto()).ToList();
-    }
+    return orders.Select(x => x.ToDto()).ToList();}
 
     /// <summary>
     /// Update multiple Orders records for Customer
     /// </summary>
-    public async Task UpdateOrders(CustomerWhereUniqueInput uniqueId, OrderWhereUniqueInput[] ordersId)
-    {
+    public async Task UpdateOrders(CustomerWhereUniqueInput uniqueId, OrderWhereUniqueInput[] ordersId) {
         var customer = await _context
               .Customers.Include(t => t.Orders)
       .FirstOrDefaultAsync(x => x.Id == uniqueId.Id);
-        if (customer == null)
-        {
-            throw new NotFoundException();
-        }
-
-        var orders = await _context
-          .Orders.Where(a => ordersId.Select(x => x.Id).Contains(a.Id))
-          .ToListAsync();
-
-        if (orders.Count == 0)
-        {
-            throw new NotFoundException();
-        }
-
-        customer.Orders = orders;
-        await _context.SaveChangesAsync();
+    if (customer == null)
+    {
+      throw new NotFoundException();
     }
+
+    var orders = await _context
+      .Orders.Where(a => ordersId.Select(x => x.Id).Contains(a.Id))
+      .ToListAsync();
+
+    if (orders.Count == 0)
+    {
+      throw new NotFoundException();
+    }
+
+    customer.Orders = orders;
+    await _context.SaveChangesAsync();}
 
 }

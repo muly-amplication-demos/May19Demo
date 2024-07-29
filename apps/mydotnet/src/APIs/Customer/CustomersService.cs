@@ -4,8 +4,7 @@ namespace Mydotnet.APIs;
 
 public class CustomersService : CustomersServiceBase
 {
-    public CustomersService(MydotnetDbContext context) : base(context)
-    {
+    public CustomersService (MydotnetDbContext context): base(context) {
     }
 
 }
