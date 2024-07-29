@@ -5,7 +5,8 @@ namespace Mydotnet.APIs;
 [ApiController()]
 public class ProductsController : ProductsControllerBase
 {
-    public ProductsController (IProductsService service): base(service) {
+    public ProductsController(IProductsService service) : base(service)
+    {
     }
 
 }

@@ -8,7 +8,9 @@ namespace Mydotnet.APIs;
 public abstract class ProductsControllerBase : ControllerBase
 {
     protected readonly IProductsService _service;
-    public ProductsControllerBase (IProductsService service) {
-        _service = service;}
+    public ProductsControllerBase(IProductsService service)
+    {
+        _service = service;
+    }
 
 }
