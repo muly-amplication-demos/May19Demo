@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Mydotnet.Infrastructure.Models;
 
@@ -7,8 +7,8 @@ namespace Mydotnet.Infrastructure;
 
 public class MydotnetDbContext : IdentityDbContext<IdentityUser>
 {
-    public MydotnetDbContext(DbContextOptions<MydotnetDbContext> options)
-        : base(options) { }
+    public MydotnetDbContext (DbContextOptions<MydotnetDbContext> options): base(options) {
+    }
 
     public DbSet<CustomerDbModel> Customers { get; set; }
 
