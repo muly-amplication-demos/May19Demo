@@ -65,8 +65,13 @@ You can run the service in development mode in two ways:
 The service will be available at the following URL:
 `http://localhost:5202/`
 
+You can access the Swagger UI at:
+`http://localhost:5202/swagger/`
+
 To access a specific endpoint, you can use the following format for the URL:
 `http://localhost:5202/api/<controller>/<endpoint>`
+e.g.
+`http://localhost:5202/api/customers/meta`
 
 ## Database migrations
 
