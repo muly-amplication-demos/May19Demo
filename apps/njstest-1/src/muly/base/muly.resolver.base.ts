@@ -13,12 +13,6 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
-import * as gqlACGuard from "../../auth/gqlAC.guard";
-import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
-import * as common from "@nestjs/common";
-import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { Muly } from "./Muly";
 import { MulyCountArgs } from "./MulyCountArgs";
 import { MulyFindManyArgs } from "./MulyFindManyArgs";
@@ -27,20 +21,10 @@ import { CreateMulyArgs } from "./CreateMulyArgs";
 import { UpdateMulyArgs } from "./UpdateMulyArgs";
 import { DeleteMulyArgs } from "./DeleteMulyArgs";
 import { MulyService } from "../muly.service";
-@common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Muly)
 export class MulyResolverBase {
-  constructor(
-    protected readonly service: MulyService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
-  ) {}
+  constructor(protected readonly service: MulyService) {}
 
-  @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
-    resource: "Muly",
-    action: "read",
-    possession: "any",
-  })
   async _muliesMeta(
     @graphql.Args() args: MulyCountArgs
   ): Promise<MetaQueryPayload> {
@@ -50,24 +34,12 @@ export class MulyResolverBase {
     };
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [Muly])
-  @nestAccessControl.UseRoles({
-    resource: "Muly",
-    action: "read",
-    possession: "any",
-  })
   async mulies(@graphql.Args() args: MulyFindManyArgs): Promise<Muly[]> {
     return this.service.mulies(args);
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => Muly, { nullable: true })
-  @nestAccessControl.UseRoles({
-    resource: "Muly",
-    action: "read",
-    possession: "own",
-  })
   async muly(@graphql.Args() args: MulyFindUniqueArgs): Promise<Muly | null> {
     const result = await this.service.muly(args);
     if (result === null) {
@@ -76,13 +48,7 @@ export class MulyResolverBase {
     return result;
   }
 
-  @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Muly)
-  @nestAccessControl.UseRoles({
-    resource: "Muly",
-    action: "create",
-    possession: "any",
-  })
   async createMuly(@graphql.Args() args: CreateMulyArgs): Promise<Muly> {
     return await this.service.createMuly({
       ...args,
@@ -90,13 +56,7 @@ export class MulyResolverBase {
     });
   }
 
-  @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Muly)
-  @nestAccessControl.UseRoles({
-    resource: "Muly",
-    action: "update",
-    possession: "any",
-  })
   async updateMuly(@graphql.Args() args: UpdateMulyArgs): Promise<Muly | null> {
     try {
       return await this.service.updateMuly({
@@ -114,11 +74,6 @@ export class MulyResolverBase {
   }
 
   @graphql.Mutation(() => Muly)
-  @nestAccessControl.UseRoles({
-    resource: "Muly",
-    action: "delete",
-    possession: "any",
-  })
   async deleteMuly(@graphql.Args() args: DeleteMulyArgs): Promise<Muly | null> {
     try {
       return await this.service.deleteMuly(args);
