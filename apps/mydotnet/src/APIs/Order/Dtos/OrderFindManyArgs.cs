@@ -5,4 +5,6 @@ using Mydotnet.Infrastructure.Models;
 namespace Mydotnet.APIs.Dtos;
 
 [BindProperties(SupportsGet = true)]
-public class OrderFindManyArgs : FindManyInput<Order, OrderWhereInput> { }
+public class OrderFindManyArgs : FindManyInput<Order, OrderWhereInput>
+{
+}

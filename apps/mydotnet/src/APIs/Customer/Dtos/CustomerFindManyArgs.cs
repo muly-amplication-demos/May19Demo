@@ -5,4 +5,6 @@ using Mydotnet.Infrastructure.Models;
 namespace Mydotnet.APIs.Dtos;
 
 [BindProperties(SupportsGet = true)]
-public class CustomerFindManyArgs : FindManyInput<Customer, CustomerWhereInput> { }
+public class CustomerFindManyArgs : FindManyInput<Customer, CustomerWhereInput>
+{
+}

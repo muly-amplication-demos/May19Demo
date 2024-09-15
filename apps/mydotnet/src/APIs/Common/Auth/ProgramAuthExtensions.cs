@@ -1,7 +1,8 @@
+using Mydotnet.Infrastructure;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.OpenApi.Models;
-using Mydotnet.Infrastructure;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace Mydotnet.APIs;
