@@ -18,3 +18,10 @@ model User {
   updatedAt DateTime @updatedAt
   username  String   @unique
 }
+
+model Muly {
+  createdAt DateTime @default(now())
+  fld1      String?
+  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
+}
